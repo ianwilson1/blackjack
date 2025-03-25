@@ -6,6 +6,9 @@ hand = [] # Holds all the cards in current hand
 isHard = False # Variable to determine whether a hand is hard
 isSoft = False # Variable to determine if the hand is soft
 
+# create a list representing a deck of cards for blackjack, aces will be represented by "a"
+deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "a"] * 4
+shuffleDeck = []
 
 # Basing on Phil Main definition
 # Calculates the current sum of the hand
@@ -50,6 +53,13 @@ def policy2(currentHand):
         return True
     else:
         return False
+    
+# Always hit if your hand is ≤ 19. Stick if your hand is 20 or 21
+def policy3(currentHand):
+    if calculateSum(currentHand) != 20 or 21:
+        return False
+    else:
+        return True
 
 # Always stick
 def policy4(currentHand):
@@ -57,19 +67,38 @@ def policy4(currentHand):
         return False
     
     return True
+
+# Always hit if the dealer's visible card is 10 or an Ace, unless your hand is 21.
+def policy5(currentHand):
+    False
+
+# Gives a card to a players hand
+def dealCard(deck):
+    return deck.pop(random.randrange(len(deck)))
+
+# Represents the dealer's hand
+def dealer(dealerHand, deck):
+    while calculateSum(dealerHand) < 17:
+        dealerHand.append(dealCard(deck))
+
+# Shuffles the deck for each new game
+def shuffleDeck(deck):
+    shuffledDeck = []
+
+    for card in range(0,52):
+        shuffledDeck.append(deck.pop(random.randrange(len(deck)))) 
+
+    return shuffledDeck
+
+
+
+
     
 
-# create a list representing a deck of cards for blackjack, aces will be represented by "a"
-deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "a"] * 4
 
 
-while (not policy1(hand)):
-    hand.append(random.choice(deck))
-        
-    print(hand)
-    print("Soft: ", isSoft)
-    print("Hard: ", isHard)
-    
-        
+
+
+
 # This might be chopped guys
        
