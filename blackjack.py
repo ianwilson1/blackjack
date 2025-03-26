@@ -38,6 +38,13 @@ def calculateSum(hand):
 
     return sum
 
+# Represents the dealer's hand
+def dealer(dealerHand, deck):
+    while calculateSum(dealerHand) < 17:
+        dealerHand.append(dealCard(deck))
+    
+    return dealerHand
+
     
 #FIXME - Ask professor if it should stop at 17 even with an ace, 
 # Or if it should stop landing at 17 even if an ace is counted as an eleven
@@ -69,7 +76,7 @@ def policy4(currentHand):
 # Always hit if the dealer's visible card is 10 or an Ace, unless your hand is 21.
 def policy5(currentHand):
     sum = calculateSum(currentHand)
-    if dealerCard in [10, "a"] and sum != 21:
+    if dealerHand in [10, "a"] and sum != 21:
         return False  # Hit
     return True  # Stick if it's not dangerous or hand is 21
 
@@ -77,12 +84,6 @@ def policy5(currentHand):
 def dealCard(deck):
     return deck.pop(random.randrange(len(deck)))
 
-# Represents the dealer's hand
-def dealer(dealerHand, deck):
-    while calculateSum(dealerHand) < 17:
-        dealerHand.append(dealCard(deck))
-    
-    return dealerHand
 
 # Shuffles the deck for each new game
 def shuffleDeck(deck):
@@ -125,7 +126,7 @@ def play(policy, deck):
         totalGames += 1
         return "Loss"
 
-def runSimulations(policy, numGames=10000):
+def runSimulations(policy, numGames):
     global wins, totalGames, deck
     
     wins = 0
@@ -149,9 +150,40 @@ def runSimulations(policy, numGames=10000):
     print(f"Wins: {results['Wins']}, Losses: {results['Losses']}, Ties: {results['Ties']}")
     print(f"Win Rate: {results['Wins'] / totalGames * 100:.2f}%")
 
-runSimulations(policy1, 10000)
+# Map user input to an actual policy functions
+def getPolicyFunction(choice):
+    policies = {
+        1: policy1,
+        2: policy2,
+        3: policy3,
+        4: policy4,
+        5: policy5
+    }
+    return policies.get(choice, None)  
 
+while True:
+    try:
+        # Show instructions
+        print("\nEnter the policy number and number of games separated by a comma (e.g., 1, 10000)")
+        print("Use 'Ctrl + C' to exit the program")
+        
+        # Get the user input
+        userInput = input("Your input: ")  # Example input: 1, 10000
 
-
-
-       
+        # Split the input by comma and trim out any whitespace
+        policyChoice, numGames = userInput.split(",")
+        policyChoice = int(policyChoice.strip())
+        numGames = int(numGames.strip())
+        
+        selectedPolicy = getPolicyFunction(policyChoice)
+        
+        if selectedPolicy:
+            runSimulations(selectedPolicy, numGames)
+        else:
+            print("Invalid policy choice. Please enter a number between 1 and 5.")
+            
+    except ValueError:
+        print("Invalid input format. Please enter your input like this: 1, 10000")
+    except KeyboardInterrupt:
+        print("\nGame over, Goodbye!")
+        break  # Break out of the loop when user hits Ctrl + C
