@@ -10,6 +10,7 @@ isSoft = False # Variable to determine if the hand is soft
 deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "a"] * 4
 shuffleDeck = []
 
+
 # Basing on Phil Main definition
 # Calculates the current sum of the hand
 def calculateSum(hand):
@@ -63,14 +64,14 @@ def policy3(currentHand):
 
 # Always stick
 def policy4(currentHand):
-    while hand < 21:
-        return False
-    
     return True
-
+    
 # Always hit if the dealer's visible card is 10 or an Ace, unless your hand is 21.
 def policy5(currentHand):
-    False
+    sum = calculateSum(currentHand)
+    if dealerCard in [10, "a"] and sum != 21:
+        return False  # Hit
+    return True  # Stick if it's not dangerous or hand is 21
 
 # Gives a card to a players hand
 def dealCard(deck):
@@ -80,25 +81,52 @@ def dealCard(deck):
 def dealer(dealerHand, deck):
     while calculateSum(dealerHand) < 17:
         dealerHand.append(dealCard(deck))
+    
+    return dealerHand
 
 # Shuffles the deck for each new game
 def shuffleDeck(deck):
     shuffledDeck = []
-
-    for card in range(0,52):
-        shuffledDeck.append(deck.pop(random.randrange(len(deck)))) 
-
+    while deck:  
+        shuffledDeck.append(deck.pop(random.randrange(len(deck))))
     return shuffledDeck
 
-
-
-
+def play(policy, deck):
+    global wins
+    global totalGames
     
+    # Initialize each hand
+    playerHand = [dealCard(deck), dealCard(deck)]
+    dealerHand = [dealCard(deck), dealCard(deck)]
+
+    # Player's turn
+    while not policy(playerHand):  # If policy returns False, the player hits
+        playerHand.append(dealCard(deck))
+        
+        if calculateSum(playerHand) > 21:  # Player busts
+            totalGames += 1
+            return "Loss"
+        
+    # Dealer's turn (if the player didn't bust)
+    dealerHand = dealer(dealerHand, deck)
+    
+    # Compare hands
+    playerTotal = calculateSum(playerHand)
+    dealerTotal = calculateSum(dealerHand)
+    
+    if dealerTotal > 21 or playerTotal > dealerTotal:  # Dealer busts or player wins
+        wins += 1
+        totalGames += 1
+        return "Win"
+    elif playerTotal == dealerTotal:
+        totalGames += 1
+        return "Tie"
+    else:
+        totalGames += 1
+        return "Loss"
 
 
 
 
 
-
-# This might be chopped guys
        
