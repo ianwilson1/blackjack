@@ -125,6 +125,31 @@ def play(policy, deck):
         totalGames += 1
         return "Loss"
 
+def runSimulations(policy, numGames=10000):
+    global wins, totalGames, deck
+    
+    wins = 0
+    totalGames = 0
+    results = {"Wins": 0, "Losses": 0, "Ties": 0}
+    
+    for _ in range(numGames):
+        # Refresh the deck for each game
+        deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "a"] * 4
+        deck = shuffleDeck(deck)
+        
+        result = play(policy, deck)
+        if result == "Win":
+            results["Wins"] += 1
+        elif result == "Loss":
+            results["Losses"] += 1
+        elif result == "Tie":
+            results["Ties"] += 1
+    
+    print(f"Results after {numGames} games with this policy:")
+    print(f"Wins: {results['Wins']}, Losses: {results['Losses']}, Ties: {results['Ties']}")
+    print(f"Win Rate: {results['Wins'] / totalGames * 100:.2f}%")
+
+runSimulations(policy1, 10000)
 
 
 
